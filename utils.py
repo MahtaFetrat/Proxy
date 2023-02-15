@@ -6,7 +6,7 @@ def parse_message(message):
 
 def parse_header(header):
     header_args = header.split(':')
-    return tuple(header_args)
+    return header_args[0], int(header_args[1]), header_args[2], int(header_args[3])
 
 
 def add_header(payload, client_app_addr, server_app_addr):

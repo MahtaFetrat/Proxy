@@ -11,26 +11,23 @@ class ClientHandler(mp.Process):
     UDP_BUFF_SIZE = 1024
     TCP_BUFF_SIZE = 2048
 
-    def __init__(self, client_app_ip, client_app_port, server_app_ip, server_app_port, tcp_sending_conn, tcp_receiving_conn):
+    def __init__(self, client_app_ip, client_app_port, server_app_ip, server_app_port, sending_tcp_socket, receiving_tcp_socket):
         super(ClientHandler, self).__init__()
         self.client_app_addr = client_app_ip, client_app_port
         self.server_app_addr = server_app_ip, server_app_port
-        self.tcp_sending_conn = tcp_sending_conn
-        self.tcp_receiving_conn = tcp_receiving_conn
+        self.sending_tcp_socket = sending_tcp_socket
+        self.receiving_tcp_socket = receiving_tcp_socket
 
         self.udp_socket = None
-        self.sending_tcp_socket = None
-        self.receiving_tcp_socket = None
 
     def handle_udp_conn_recv(self):
         while True:
             payload, _ = self.udp_socket.recvfrom(ClientHandler.UDP_BUFF_SIZE)
-            message = add_header(
-                payload, self.client_app_addr, self.server_app_addr)
+            message = add_header(payload.decode(), self.client_app_addr, self.server_app_addr)
             self.receiving_tcp_socket.send(message.encode())
 
     def handle_tcp_conn_recv(self):
-        message = self.sending_tcp_socket.recv(ClientHandler.TCP_BUFF_SIZE)
+        message = self.sending_tcp_socket.recv(ClientHandler.TCP_BUFF_SIZE).decode()
         _, payload = parse_message(message)
         self.udp_socket.sendto(payload.encode(), self.server_app_addr)
 
@@ -70,7 +67,7 @@ class XServer:
         return conn_addr, payload
 
     def connection_duplex(self, conn_addr):
-        return self.tcp_sending_conns[conn_addr] and self.tcp_receiving_conns[conn_addr]
+        return conn_addr in self.tcp_sending_conns and conn_addr in self.tcp_receiving_conns
 
     def handle_connections(self):
         while True:
@@ -80,8 +77,7 @@ class XServer:
             conn_dict[conn_addr] = conn
 
             if self.connection_duplex(conn_addr):
-                ClientHandler(
-                    *conn_addr, self.tcp_sending_conns[conn_addr], self.tcp_receiving_conns[conn_addr]).start()
+                ClientHandler(*conn_addr, self.tcp_sending_conns[conn_addr], self.tcp_receiving_conns[conn_addr]).start()
 
     def create_listening_tcp_socket(self):
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

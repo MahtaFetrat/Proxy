@@ -23,14 +23,14 @@ class Client:
         self.xclient_addr = addr
 
     def send_sample_packets(self):
-        for m in self.messages:
-            self.udp_socket.sendto(m.encode(), self.xclient_addr)
-            print(f"Sent '{m}'.")
+        for message in self.messages:
+            self.udp_socket.sendto(message.encode(), self.xclient_addr)
+            print(f"Sent '{message}'.")
 
     def receive_responses(self):
-        for _ in range(self.messages):
+        for _ in self.messages:
             message, _ = self.udp_socket.recvfrom(BUFFSIZE)
-            print(f"Received: '{message}'")
+            print(f"Received: '{message.decode()}'")
 
     def start(self):
         self.bind_udp()

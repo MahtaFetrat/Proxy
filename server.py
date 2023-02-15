@@ -23,7 +23,7 @@ class Server:
     def handle_requests(self):
         while True:
             message, addr = self.udp_socket.recvfrom(BUFFSIZE)
-            _, payload = parse_message(message)
+            _, payload = parse_message(message.decode())
             response = self.build_response(payload)
             self.udp_socket.sendto(response.encode(), addr)
 
