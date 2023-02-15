@@ -1,9 +1,7 @@
 import socket
 
 IP = 'localhost'
-XCLIENT_IP = 'localhost'
 BUFFSIZE = 1024
-
 
 class Client:
     def __init__(self):

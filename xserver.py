@@ -3,7 +3,6 @@ from threading import Thread
 import multiprocessing as mp
 from utils import parse_message, parse_header, add_header
 
-XCLIENT_IP = 'localhost'
 XSERVER_IP = 'localhost'
 XSERVER_PORT = 8080
 
@@ -37,7 +36,7 @@ class ClientHandler(mp.Process):
     def create_udp_connection(self):
         try:
             self.udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-            self.udp_socket.bind((XCLIENT_IP, 0))
+            self.udp_socket.bind((XSERVER_IP, 0))
             udp_socket_name = self.udp_socket.getsockname()[1]
         except socket.error as e:
             print("(Error) Error opening the UDP socket: {}".format(e))

@@ -2,9 +2,7 @@ import socket
 from utils import parse_message
 
 IP = 'localhost'
-XCLIENT_IP = 'localhost'
 BUFFSIZE = 1024
-
 
 class Server:
     def __init__(self):

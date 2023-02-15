@@ -6,7 +6,7 @@ from threading import Thread
 import multiprocessing as mp
 from utils import add_header
 
-XCLIENT_IP = 'localhost'
+IP = 'localhost'
 XSERVER_IP = 'localhost'
 XSERVER_PORT = 8080
 
