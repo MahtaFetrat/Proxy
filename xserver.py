@@ -86,10 +86,8 @@ class XServer:
         while True:
             conn, _ = self.tcp_socket.accept()
             conn_addr, send_recv = self.identify_connection(conn)
-            if send_recv == "sending":
-                self.tcp_sending_conns[conn_addr] = conn
-            elif send_recv == "receiving":
-                self.tcp_receiving_conns[conn_addr] = conn
+            conn_dict = self.tcp_sending_conns if send_recv == "sending" else self.tcp_receiving_conns
+            conn_dict[conn_addr] = conn
 
             if self.connection_duplex(conn_addr):
                 ClientHandler(*conn_addr, self.tcp_sending_conns[conn_addr], self.tcp_receiving_conns[conn_addr]).start()
