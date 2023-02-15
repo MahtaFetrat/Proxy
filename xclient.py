@@ -38,14 +38,14 @@ class ClientHandler(mp.Process):
     def create_udp_connection(self):
         try:
             self.listening_udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-            self.listening_udp_socket.bind((XCLIENT_IP, 0))
+            self.listening_udp_socket.bind((IP, 0))
             udp_socket_name = self.listening_udp_socket.getsockname()[1]
             self.listening_udp_socket.sendto(str(udp_socket_name).encode(), self.client_app_addr)
         except socket.error as e:
             print("(Error) Error opening the UDP socket: {}".format(e))
-            print("(Error) Cannot open the UDP socket {}:{} or bind to it".format(XCLIENT_IP, udp_socket_name))
+            print("(Error) Cannot open the UDP socket {}:{} or bind to it".format(IP, udp_socket_name))
         else:
-            print("Bind to the UDP socket {}:{}".format(XCLIENT_IP, udp_socket_name))
+            print("Bind to the UDP socket {}:{}".format(IP, udp_socket_name))
 
     def create_sending_tcp_connection(self):
         try:
@@ -62,7 +62,7 @@ class ClientHandler(mp.Process):
             print("Connected the TCP socket to {}:{}.".format(XSERVER_IP, XSERVER_PORT))
 
     def create_receiving_tcp_connection(self):
-        receiving_tcp_socket_name = XCLIENT_IP, 0
+        receiving_tcp_socket_name = IP, 0
         try:
             self.receiving_tcp_socket = socket.socket()
             self.receiving_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
