@@ -26,24 +26,30 @@ class ClientHandler(mp.Process):
 
     def handle_udp_conn_recv(self):
         while True:
-            payload, _ = self.listening_udp_socket.recvfrom(ClientHandler.UDP_BUFF_SIZE)
-            message = add_header(payload, self.client_app_addr, self.server_app_addr)
+            payload, _ = self.listening_udp_socket.recvfrom(
+                ClientHandler.UDP_BUFF_SIZE)
+            message = add_header(
+                payload, self.client_app_addr, self.server_app_addr)
             self.sending_tcp_socket.send(message.encode())
 
     def handle_tcp_conn_recv(self):
         message = self.receiving_tcp_socket.recv(ClientHandler.TCP_BUFF_SIZE)
         payload = ''.join(message.split('\n')[1:])
-        self.listening_udp_socket.sendto(payload.encode(), self.client_app_addr)
+        self.listening_udp_socket.sendto(
+            payload.encode(), self.client_app_addr)
 
     def create_udp_connection(self):
         try:
-            self.listening_udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+            self.listening_udp_socket = socket.socket(
+                family=socket.AF_INET, type=socket.SOCK_DGRAM)
             self.listening_udp_socket.bind((IP, 0))
             udp_socket_name = self.listening_udp_socket.getsockname()[1]
-            self.listening_udp_socket.sendto(str(udp_socket_name).encode(), self.client_app_addr)
+            self.listening_udp_socket.sendto(
+                str(udp_socket_name).encode(), self.client_app_addr)
         except socket.error as e:
             print("(Error) Error opening the UDP socket: {}".format(e))
-            print("(Error) Cannot open the UDP socket {}:{} or bind to it".format(IP, udp_socket_name))
+            print("(Error) Cannot open the UDP socket {}:{} or bind to it".format(
+                IP, udp_socket_name))
         else:
             print("Bind to the UDP socket {}:{}".format(IP, udp_socket_name))
 
@@ -52,14 +58,17 @@ class ClientHandler(mp.Process):
             self.sending_tcp_socket = socket.socket()
             self.sending_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
             payload = "sending"
-            message = add_header(payload, self.client_app_addr, self.server_app_addr)
+            message = add_header(
+                payload, self.client_app_addr, self.server_app_addr)
             self.sending_tcp_socket.send(message)
         except socket.error as e:
             print("(Error) Error opening the sending TCP socket: {}.".format(e))
-            print("(Error) Cannot connect sending TCP socket to {}:{}.".format(XSERVER_IP, XSERVER_PORT))
+            print("(Error) Cannot connect sending TCP socket to {}:{}.".format(
+                XSERVER_IP, XSERVER_PORT))
             sys.exit(1)
         else:
-            print("Connected the TCP socket to {}:{}.".format(XSERVER_IP, XSERVER_PORT))
+            print("Connected the TCP socket to {}:{}.".format(
+                XSERVER_IP, XSERVER_PORT))
 
     def create_receiving_tcp_connection(self):
         receiving_tcp_socket_name = IP, 0
@@ -67,15 +76,19 @@ class ClientHandler(mp.Process):
             self.receiving_tcp_socket = socket.socket()
             self.receiving_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
             payload = "receiving"
-            message = add_header(payload, self.client_app_addr, self.server_app_addr)
+            message = add_header(
+                payload, self.client_app_addr, self.server_app_addr)
             self.receiving_tcp_socket.send(message)
         except socket.error as e:
             print("(Error) Error opening the receiving TCP socket: {}".format(e))
-            print("(Error) Cannot connect receiving TCP socket to {}:{}.".format(*receiving_tcp_socket_name))
+            print("(Error) Cannot connect receiving TCP socket to {}:{}.".format(
+                *receiving_tcp_socket_name))
         else:
-            print("Connected the TCP socket to {}:{}.".format(*receiving_tcp_socket_name))
+            print("Connected the TCP socket to {}:{}.".format(
+                *receiving_tcp_socket_name))
 
-        self.sending_tcp_socket.send("{}:{}".format(*receiving_tcp_socket_name).encode())
+        self.sending_tcp_socket.send("{}:{}".format(
+            *receiving_tcp_socket_name).encode())
 
     def run(self):
         self.create_udp_connection()
@@ -112,7 +125,8 @@ class XClient:
             server_app_ip = tun_addr.split(':')[2]
             server_app_port = int(tun_addr.split(':')[3])
 
-            ClientHandler(client_app_ip, client_app_port, server_app_ip, server_app_port).start()
+            ClientHandler(client_app_ip, client_app_port,
+                          server_app_ip, server_app_port).start()
 
         try:
             while True:
@@ -123,6 +137,7 @@ class XClient:
     def start(self):
         self.parse_input_argument()
         self.start_processes()
+
 
 if __name__ == "__main__":
     XClient().start()

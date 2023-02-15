@@ -3,14 +3,17 @@ import socket
 IP = 'localhost'
 BUFFSIZE = 1024
 
+
 class Client:
     def __init__(self):
         self.udp_socket = None
         self.xclient_addr = None
-        self.messages = ["Sample Message 1.", "Sample Message 2.", "Sample Message 3."]
+        self.messages = ["Sample Message 1.",
+                         "Sample Message 2.", "Sample Message 3."]
 
     def bind_udp(self):
-        self.udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.udp_socket = socket.socket(
+            family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.udp_socket.bind((IP, 0))
         udp_socket_name = self.udp_socket.getsockname()[1]
         print(f"Listening UDP on {IP}:{udp_socket_name}")

@@ -25,7 +25,8 @@ class ClientHandler(mp.Process):
     def handle_udp_conn_recv(self):
         while True:
             payload, _ = self.udp_socket.recvfrom(ClientHandler.UDP_BUFF_SIZE)
-            message = add_header(payload, self.client_app_addr, self.server_app_addr)
+            message = add_header(
+                payload, self.client_app_addr, self.server_app_addr)
             self.receiving_tcp_socket.send(message.encode())
 
     def handle_tcp_conn_recv(self):
@@ -35,14 +36,17 @@ class ClientHandler(mp.Process):
 
     def create_udp_connection(self):
         try:
-            self.udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+            self.udp_socket = socket.socket(
+                family=socket.AF_INET, type=socket.SOCK_DGRAM)
             self.udp_socket.bind((XSERVER_IP, 0))
             udp_socket_name = self.udp_socket.getsockname()[1]
         except socket.error as e:
             print("(Error) Error opening the UDP socket: {}".format(e))
-            print("(Error) Cannot open the UDP socket {}:{} or bind to it".format(XSERVER_IP, udp_socket_name))
+            print("(Error) Cannot open the UDP socket {}:{} or bind to it".format(
+                XSERVER_IP, udp_socket_name))
         else:
-            print("Bind to the UDP socket {}:{}".format(XSERVER_IP, udp_socket_name))
+            print("Bind to the UDP socket {}:{}".format(
+                XSERVER_IP, udp_socket_name))
 
     def run(self):
         self.create_udp_connection()
@@ -76,7 +80,8 @@ class XServer:
             conn_dict[conn_addr] = conn
 
             if self.connection_duplex(conn_addr):
-                ClientHandler(*conn_addr, self.tcp_sending_conns[conn_addr], self.tcp_receiving_conns[conn_addr]).start()
+                ClientHandler(
+                    *conn_addr, self.tcp_sending_conns[conn_addr], self.tcp_receiving_conns[conn_addr]).start()
 
     def create_listening_tcp_socket(self):
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -86,6 +91,7 @@ class XServer:
     def start(self):
         self.create_listening_tcp_socket()
         self.handle_connections()
+
 
 if __name__ == "__main__":
     XServer().start()
