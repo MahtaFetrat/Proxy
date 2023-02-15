@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 import multiprocessing as mp
+from utils import parse_message, parse_header, add_header
 
 XCLIENT_IP = 'localhost'
 XSERVER_IP = 'localhost'
@@ -22,19 +23,15 @@ class ClientHandler(mp.Process):
         self.sending_tcp_socket = None
         self.receiving_tcp_socket = None
 
-    def add_header(self, payload):
-        header = "{}:{}:{}:{}\n".format(*self.client_app_addr, *self.server_app_addr)
-        return header + payload
-
     def handle_udp_conn_recv(self):
         while True:
             payload, _ = self.udp_socket.recvfrom(ClientHandler.UDP_BUFF_SIZE)
-            message = self.add_header(payload)
+            message = add_header(payload, self.client_app_addr, self.server_app_addr)
             self.receiving_tcp_socket.send(message.encode())
 
     def handle_tcp_conn_recv(self):
         message = self.sending_tcp_socket.recv(ClientHandler.TCP_BUFF_SIZE)
-        _, payload = XServer.parse_message(message)
+        _, payload = parse_message(message)
         self.udp_socket.sendto(payload.encode(), self.server_app_addr)
 
     def create_udp_connection(self):
@@ -63,20 +60,10 @@ class XServer:
         self.tcp_sending_conns = {}
         self.tcp_receiving_conns = {}
 
-    def parse_header(self, header):
-        header_args = header.split(':')
-        return tuple(header_args)
-
-    @staticmethod
-    def parse_message(message):
-        header = message.split('\n')[0]
-        payload = ''.join(message.split('\n')[1:])
-        return header, payload
-
     def identify_connection(self, conn):
         message = conn.recv(XServer.BUFF_SIZE).decode()
-        header, payload = self.parse_message(message)
-        conn_addr = self.parse_header(header)
+        header, payload = parse_message(message)
+        conn_addr = parse_header(header)
         return conn_addr, payload
 
     def connection_duplex(self, conn_addr):

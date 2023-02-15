@@ -4,6 +4,7 @@ import sys
 import time
 from threading import Thread
 import multiprocessing as mp
+from utils import add_header
 
 XCLIENT_IP = 'localhost'
 XSERVER_IP = 'localhost'
@@ -23,14 +24,10 @@ class ClientHandler(mp.Process):
         self.sending_tcp_socket = None
         self.receiving_tcp_socket = None
 
-    def add_header(self, payload):
-        header = "{}:{}:{}:{}\n".format(*self.client_app_addr, *self.server_app_addr)
-        return header + payload
-
     def handle_udp_conn_recv(self):
         while True:
             payload, _ = self.listening_udp_socket.recvfrom(ClientHandler.UDP_BUFF_SIZE)
-            message = self.add_header(payload)
+            message = add_header(payload, self.client_app_addr, self.server_app_addr)
             self.sending_tcp_socket.send(message.encode())
 
     def handle_tcp_conn_recv(self):
@@ -55,7 +52,7 @@ class ClientHandler(mp.Process):
             self.sending_tcp_socket = socket.socket()
             self.sending_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
             payload = "sending"
-            message = self.add_header(payload)
+            message = add_header(payload, self.client_app_addr, self.server_app_addr)
             self.sending_tcp_socket.send(message)
         except socket.error as e:
             print("(Error) Error opening the sending TCP socket: {}.".format(e))
@@ -70,7 +67,7 @@ class ClientHandler(mp.Process):
             self.receiving_tcp_socket = socket.socket()
             self.receiving_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
             payload = "receiving"
-            message = self.add_header(payload)
+            message = add_header(payload, self.client_app_addr, self.server_app_addr)
             self.receiving_tcp_socket.send(message)
         except socket.error as e:
             print("(Error) Error opening the receiving TCP socket: {}".format(e))
