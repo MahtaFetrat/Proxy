@@ -1,5 +1,4 @@
 import socket
-import time
 
 IP = 'localhost'
 BUFF_SIZE = 1024
@@ -14,7 +13,7 @@ class Client:
     def bind_udp(self):
         self.udp_socket = socket.socket(
             family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        self.udp_socket.bind((IP, 57078))
+        self.udp_socket.bind((IP, 57200))
         udp_socket_name = self.udp_socket.getsockname()[1]
         print(f"Listening UDP on {IP}:{udp_socket_name}")
 
