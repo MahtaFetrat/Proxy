@@ -12,3 +12,16 @@ def parse_header(header):
 def add_header(payload, client_app_addr, server_app_addr):
     header = "{}:{}:{}:{}\n".format(*client_app_addr, *server_app_addr)
     return header + payload
+
+
+def acked_send(message, socket, buff_size):
+    print(f"Sent tcp message '{message}'.")
+    socket.send(message.encode())
+    socket.recv(buff_size)
+
+
+def acked_recv(socket, buff_size):
+    message = socket.recv(buff_size).decode()
+    print(f"Received tcp message '{message}'.")
+    socket.send("ACK".encode())
+    return message
