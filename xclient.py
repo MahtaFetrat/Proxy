@@ -1,5 +1,6 @@
 import socket
 import argparse
+import ssl
 import sys
 import time
 from threading import Thread
@@ -56,6 +57,7 @@ class ClientHandler(mp.Process):
     def create_sending_tcp_connection(self):
         try:
             self.sending_tcp_socket = socket.socket()
+            self.sending_tcp_socket = ssl.wrap_socket(self.sending_tcp_socket)  # ssl_version = PROTOCOL_TLS
             self.sending_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
             payload = "sending"
             message = add_header(payload, self.client_app_addr, self.server_app_addr)
@@ -72,6 +74,7 @@ class ClientHandler(mp.Process):
     def create_receiving_tcp_connection(self):
         try:
             self.receiving_tcp_socket = socket.socket()
+            self.receiving_tcp_socket = ssl.wrap_socket(self.receiving_tcp_socket)
             self.receiving_tcp_socket.connect((XSERVER_IP, XSERVER_PORT))
             payload = "receiving"
             message = add_header(payload, self.client_app_addr, self.server_app_addr)
