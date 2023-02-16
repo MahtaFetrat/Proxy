@@ -1,4 +1,5 @@
 import socket
+import ssl
 from threading import Thread
 import multiprocessing as mp
 from utils import parse_message, parse_header, add_header, acked_recv, acked_send
@@ -90,6 +91,10 @@ class XServer:
         self.tcp_socket.bind((XSERVER_IP, XSERVER_PORT))
         print(f"Listening TCP on {XSERVER_IP}:{XSERVER_PORT}")
         self.tcp_socket.listen()
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain('/home/matt/Downloads/Semester7/network/project/cacert.pem', '/home/matt/Downloads/Semester7/network/project/private.pem')
+
+        self.tcp_socket = context.wrap_socket(self.tcp_socket, server_side=True)
 
     def start(self):
         self.create_listening_tcp_socket()
