@@ -11,7 +11,7 @@ class Server:
     def bind_udp(self):
         self.udp_socket = socket.socket(
             family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        self.udp_socket.bind((IP, 57013))
+        self.udp_socket.bind((IP, 57300))
         udp_socket_name = self.udp_socket.getsockname()[1]
         print(f"Listening UDP on {IP}:{udp_socket_name}")
 
