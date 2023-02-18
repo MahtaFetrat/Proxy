@@ -1,4 +1,4 @@
-# create x-client
+# create x-server
 
 import socket
 from threading import Thread
